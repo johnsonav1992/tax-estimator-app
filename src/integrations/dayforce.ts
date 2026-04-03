@@ -103,8 +103,17 @@ class DayforceParser extends PaystubParserBase {
   id = "dayforce";
 
   matches(text: string) {
-    const normalized = text.toUpperCase().replace(/[^A-Z0-9]/g, "");
-    return normalized.includes("DAYFORCE");
+    const normalized = text.toUpperCase();
+    const compact = normalized.replace(/[^A-Z0-9]/g, "");
+    if (compact.includes("DAYFORCE")) {
+      return true;
+    }
+
+    const hasDepositAdvice = normalized.includes("DEPOSIT ADVICE #");
+    const hasFederalExtra = normalized.includes("FEDERAL 2C/EXTRA");
+    const hasPayFrequency = normalized.includes("PAY FREQUENCY");
+    const hasMemoInfo = normalized.includes("MEMO INFORMATION");
+    return (hasDepositAdvice && hasFederalExtra) || (hasDepositAdvice && hasPayFrequency) || hasMemoInfo;
   }
 
   parse(text: string): PaystubExtraction {
