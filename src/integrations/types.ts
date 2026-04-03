@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { PaystubParserBase } from "./PaystubParserBase";
 
 export const paystubExtractionSchema = z
   .object({
@@ -14,8 +15,4 @@ export const paystubExtractionSchema = z
 
 export type PaystubExtraction = z.infer<typeof paystubExtractionSchema>;
 
-export type PaystubParser = {
-  id: string;
-  matches: (text: string) => boolean;
-  parse: (text: string) => PaystubExtraction;
-};
+export type PaystubParser = InstanceType<typeof PaystubParserBase>;
