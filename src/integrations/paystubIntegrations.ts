@@ -1,0 +1,11 @@
+import type { PaystubParser } from "./types";
+import { genericParser } from "./generic";
+import { justworksParser } from "./justworks";
+import { dayforceParser } from "./dayforce";
+
+export const paystubParsers: PaystubParser[] = [justworksParser, dayforceParser, genericParser];
+
+export const parsePaystubWithIntegrations = (text: string) => {
+  const parser = paystubParsers.find((entry) => entry.matches(text)) ?? genericParser;
+  return parser.parse(text);
+};
