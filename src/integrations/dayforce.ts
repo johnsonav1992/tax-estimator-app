@@ -98,7 +98,7 @@ const detectPayFrequency = (text: string): PaystubExtraction["payFrequency"] => 
   return undefined;
 };
 
-const parseOec = (text: string): PaystubExtraction => {
+const parseDayforce = (text: string): PaystubExtraction => {
   const lines = text
     .split(/\r?\n/)
     .map((line) => line.trim())
@@ -123,7 +123,7 @@ export const dayforceParser: PaystubParser = {
   id: "dayforce",
   matches: (text) => {
     const normalized = text.toUpperCase().replace(/[^A-Z0-9]/g, "");
-    return normalized.includes("DAYFORCE") || normalized.includes("OECONNECTIONLLC");
+    return normalized.includes("DAYFORCE");
   },
-  parse: parseOec,
+  parse: parseDayforce,
 };
