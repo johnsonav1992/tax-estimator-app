@@ -5,6 +5,7 @@ node_modules
 /dist
 /.output
 /.vinxi
+/.tanstack
 
 # logs
 npm-debug.log*
@@ -30,3 +31,6 @@ pnpm-debug.log*
 
 # misc
 *.local
+
+# generated
+src/routeTree.gen.ts
