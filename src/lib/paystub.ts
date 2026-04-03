@@ -67,6 +67,6 @@ export const extractPdfText = async (file: File): Promise<string> => {
     text += `${pageText}\n`;
   }
 
-  console.log(text)
+  console.log(text);
   return text;
 };

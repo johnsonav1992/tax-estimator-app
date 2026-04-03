@@ -108,14 +108,14 @@ class DayforceParser extends PaystubParserBase {
   }
 
   parse(text: string): PaystubExtraction {
-  const lines = text
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
+    const lines = text
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
 
-  const earnings = findAmountPairAfterLabel(lines, /^EARNINGS\b/);
-  const fed = findAmountPairAfterLabel(lines, /^FED W\/H|^FED WH|^FEDERAL W\/H/);
-  const pretax = findAmountPairAfterLabel(lines, /^PRE[-\s]?TAX DEDUCTIONS\b/);
+    const earnings = findAmountPairAfterLabel(lines, /^EARNINGS\b/);
+    const fed = findAmountPairAfterLabel(lines, /^FED W\/H|^FED WH|^FEDERAL W\/H/);
+    const pretax = findAmountPairAfterLabel(lines, /^PRE[-\s]?TAX DEDUCTIONS\b/);
 
     return paystubExtractionSchema.parse({
       currentGross: earnings.current ?? undefined,

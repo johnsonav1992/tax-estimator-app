@@ -72,15 +72,15 @@ class JustworksParser extends PaystubParserBase {
   }
 
   parse(text: string): PaystubExtraction {
-  const lines = text
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
+    const lines = text
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
 
-  const grossTotals = findLineAmountsByPrefix(lines, /^GROSS EARNINGS TOTALS/i);
-  const salary = findLineAmountsByPrefix(lines, /^SALARY/i);
-  const federal = findLineAmountsByPrefix(lines, /^FEDERAL INCOME TAX/i);
-  const pretaxTotals = findLineAmountsByPrefix(lines, /^PRE[-\s]?TAX DEDUCTIONS TOTALS/i);
+    const grossTotals = findLineAmountsByPrefix(lines, /^GROSS EARNINGS TOTALS/i);
+    const salary = findLineAmountsByPrefix(lines, /^SALARY/i);
+    const federal = findLineAmountsByPrefix(lines, /^FEDERAL INCOME TAX/i);
+    const pretaxTotals = findLineAmountsByPrefix(lines, /^PRE[-\s]?TAX DEDUCTIONS TOTALS/i);
 
     return paystubExtractionSchema.parse({
       currentGross: grossTotals.current ?? salary.current ?? undefined,

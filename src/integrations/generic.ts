@@ -68,18 +68,18 @@ class GenericParser extends PaystubParserBase {
   }
 
   parse(text: string): PaystubExtraction {
-  const lines = text
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
+    const lines = text
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
 
-  const grossLine = findLine(lines, /^GROSS|^EARNINGS/);
-  const fedLine = findLine(lines, /^FEDERAL INCOME TAX|^FED W\/H|^FED WH/);
-  const pretaxLine = findLine(lines, /^PRE[-\s]?TAX DEDUCTIONS/);
+    const grossLine = findLine(lines, /^GROSS|^EARNINGS/);
+    const fedLine = findLine(lines, /^FEDERAL INCOME TAX|^FED W\/H|^FED WH/);
+    const pretaxLine = findLine(lines, /^PRE[-\s]?TAX DEDUCTIONS/);
 
-  const gross = grossLine ? pickPairFromLine(grossLine) : { current: null, ytd: null };
-  const fed = fedLine ? pickPairFromLine(fedLine) : { current: null, ytd: null };
-  const pretax = pretaxLine ? pickPairFromLine(pretaxLine) : { current: null, ytd: null };
+    const gross = grossLine ? pickPairFromLine(grossLine) : { current: null, ytd: null };
+    const fed = fedLine ? pickPairFromLine(fedLine) : { current: null, ytd: null };
+    const pretax = pretaxLine ? pickPairFromLine(pretaxLine) : { current: null, ytd: null };
 
     return paystubExtractionSchema.parse({
       currentGross: gross.current ?? undefined,
