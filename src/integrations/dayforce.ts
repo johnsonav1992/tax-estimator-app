@@ -1,5 +1,6 @@
 import { paystubExtractionSchema } from "./types";
-import type { PaystubExtraction, PaystubParser } from "./types";
+import { PaystubParserBase } from "./PaystubParserBase";
+import type { PaystubExtraction } from "./types";
 
 const moneyRegex = /\$[\d,]+(?:\.\d{2})?/g;
 const numberRegex = /\d{1,3}(?:,\d{3})*(?:\.\d{2})?|\d+(?:\.\d{2})?/g;
@@ -98,7 +99,15 @@ const detectPayFrequency = (text: string): PaystubExtraction["payFrequency"] => 
   return undefined;
 };
 
-const parseDayforce = (text: string): PaystubExtraction => {
+class DayforceParser extends PaystubParserBase {
+  id = "dayforce";
+
+  matches(text: string) {
+    const normalized = text.toUpperCase().replace(/[^A-Z0-9]/g, "");
+    return normalized.includes("DAYFORCE");
+  }
+
+  parse(text: string): PaystubExtraction {
   const lines = text
     .split(/\r?\n/)
     .map((line) => line.trim())
@@ -108,22 +117,16 @@ const parseDayforce = (text: string): PaystubExtraction => {
   const fed = findAmountPairAfterLabel(lines, /^FED W\/H|^FED WH|^FEDERAL W\/H/);
   const pretax = findAmountPairAfterLabel(lines, /^PRE[-\s]?TAX DEDUCTIONS\b/);
 
-  return paystubExtractionSchema.parse({
-    currentGross: earnings.current ?? undefined,
-    ytdWages: earnings.ytd ?? undefined,
-    currentWithholding: fed.current ?? undefined,
-    ytdWithholding: fed.ytd ?? undefined,
-    currentPreTax: pretax.current ?? undefined,
-    ytdPreTax: pretax.ytd ?? undefined,
-    payFrequency: detectPayFrequency(text),
-  });
-};
+    return paystubExtractionSchema.parse({
+      currentGross: earnings.current ?? undefined,
+      ytdWages: earnings.ytd ?? undefined,
+      currentWithholding: fed.current ?? undefined,
+      ytdWithholding: fed.ytd ?? undefined,
+      currentPreTax: pretax.current ?? undefined,
+      ytdPreTax: pretax.ytd ?? undefined,
+      payFrequency: detectPayFrequency(text),
+    });
+  }
+}
 
-export const dayforceParser: PaystubParser = {
-  id: "dayforce",
-  matches: (text) => {
-    const normalized = text.toUpperCase().replace(/[^A-Z0-9]/g, "");
-    return normalized.includes("DAYFORCE");
-  },
-  parse: parseDayforce,
-};
+export const dayforceParser = new DayforceParser();

@@ -1,5 +1,6 @@
 import { paystubExtractionSchema } from "./types";
-import type { PaystubExtraction, PaystubParser } from "./types";
+import { PaystubParserBase } from "./PaystubParserBase";
+import type { PaystubExtraction } from "./types";
 
 const moneyRegex = /\$[\d,]+(?:\.\d{2})?/g;
 const numberRegex = /\d{1,3}(?:,\d{3})*(?:\.\d{2})?|\d+(?:\.\d{2})?/g;
@@ -59,7 +60,14 @@ const detectPayFrequency = (text: string): PaystubExtraction["payFrequency"] => 
   return undefined;
 };
 
-const parseGeneric = (text: string): PaystubExtraction => {
+class GenericParser extends PaystubParserBase {
+  id = "generic";
+
+  matches(_text: string) {
+    return true;
+  }
+
+  parse(text: string): PaystubExtraction {
   const lines = text
     .split(/\r?\n/)
     .map((line) => line.trim())
@@ -73,19 +81,16 @@ const parseGeneric = (text: string): PaystubExtraction => {
   const fed = fedLine ? pickPairFromLine(fedLine) : { current: null, ytd: null };
   const pretax = pretaxLine ? pickPairFromLine(pretaxLine) : { current: null, ytd: null };
 
-  return paystubExtractionSchema.parse({
-    currentGross: gross.current ?? undefined,
-    ytdWages: gross.ytd ?? undefined,
-    currentWithholding: fed.current ?? undefined,
-    ytdWithholding: fed.ytd ?? undefined,
-    currentPreTax: pretax.current ?? undefined,
-    ytdPreTax: pretax.ytd ?? undefined,
-    payFrequency: detectPayFrequency(text),
-  });
-};
+    return paystubExtractionSchema.parse({
+      currentGross: gross.current ?? undefined,
+      ytdWages: gross.ytd ?? undefined,
+      currentWithholding: fed.current ?? undefined,
+      ytdWithholding: fed.ytd ?? undefined,
+      currentPreTax: pretax.current ?? undefined,
+      ytdPreTax: pretax.ytd ?? undefined,
+      payFrequency: detectPayFrequency(text),
+    });
+  }
+}
 
-export const genericParser: PaystubParser = {
-  id: "generic",
-  matches: () => true,
-  parse: parseGeneric,
-};
+export const genericParser = new GenericParser();

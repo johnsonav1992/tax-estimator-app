@@ -1,5 +1,6 @@
 import { paystubExtractionSchema } from "./types";
-import type { PaystubExtraction, PaystubParser } from "./types";
+import { PaystubParserBase } from "./PaystubParserBase";
+import type { PaystubExtraction } from "./types";
 
 const moneyRegex = /\$[\d,]+(?:\.\d{2})?/g;
 const numberRegex = /\d{1,3}(?:,\d{3})*(?:\.\d{2})?|\d+(?:\.\d{2})?/g;
@@ -63,7 +64,14 @@ const detectPayFrequency = (text: string): PaystubExtraction["payFrequency"] => 
   return undefined;
 };
 
-const parseJustworks = (text: string): PaystubExtraction => {
+class JustworksParser extends PaystubParserBase {
+  id = "justworks";
+
+  matches(text: string) {
+    return text.toUpperCase().includes("JUSTWORKS EMPLOYMENT GROUP LLC");
+  }
+
+  parse(text: string): PaystubExtraction {
   const lines = text
     .split(/\r?\n/)
     .map((line) => line.trim())
@@ -74,19 +82,16 @@ const parseJustworks = (text: string): PaystubExtraction => {
   const federal = findLineAmountsByPrefix(lines, /^FEDERAL INCOME TAX/i);
   const pretaxTotals = findLineAmountsByPrefix(lines, /^PRE[-\s]?TAX DEDUCTIONS TOTALS/i);
 
-  return paystubExtractionSchema.parse({
-    currentGross: grossTotals.current ?? salary.current ?? undefined,
-    ytdWages: grossTotals.ytd ?? salary.ytd ?? undefined,
-    currentWithholding: federal.current ?? undefined,
-    ytdWithholding: federal.ytd ?? undefined,
-    currentPreTax: pretaxTotals.current ?? undefined,
-    ytdPreTax: pretaxTotals.ytd ?? undefined,
-    payFrequency: detectPayFrequency(text),
-  });
-};
+    return paystubExtractionSchema.parse({
+      currentGross: grossTotals.current ?? salary.current ?? undefined,
+      ytdWages: grossTotals.ytd ?? salary.ytd ?? undefined,
+      currentWithholding: federal.current ?? undefined,
+      ytdWithholding: federal.ytd ?? undefined,
+      currentPreTax: pretaxTotals.current ?? undefined,
+      ytdPreTax: pretaxTotals.ytd ?? undefined,
+      payFrequency: detectPayFrequency(text),
+    });
+  }
+}
 
-export const justworksParser: PaystubParser = {
-  id: "justworks",
-  matches: (text) => text.toUpperCase().includes("JUSTWORKS EMPLOYMENT GROUP LLC"),
-  parse: parseJustworks,
-};
+export const justworksParser = new JustworksParser();
