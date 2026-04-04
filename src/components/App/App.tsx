@@ -84,7 +84,16 @@ export function App() {
   ];
 
   const estimatedBalance = summary.estimatedBalance;
-  const balanceEmphasis = estimatedBalance >= 0 ? "positive" : "negative";
+  const hasAnyInputs =
+    summary.projectedWages > 0 ||
+    summary.otherIncomeTotal > 0 ||
+    summary.totalPayments > 0 ||
+    summary.totalTax > 0;
+  const balanceEmphasis = hasAnyInputs
+    ? estimatedBalance >= 0
+      ? "positive"
+      : "negative"
+    : undefined;
 
   const updateBracket = (index: number, updated: BracketRow) => {
     setForm((prev) => ({
@@ -182,7 +191,13 @@ export function App() {
               ? formatMoney(estimatedBalance)
               : formatMoney(Math.abs(estimatedBalance))
           }
-          detail={estimatedBalance >= 0 ? "Projected refund" : "Projected amount due"}
+          detail={
+            hasAnyInputs
+              ? estimatedBalance >= 0
+                ? "Projected refund"
+                : "Projected amount due"
+              : "Enter values to estimate"
+          }
           emphasis={balanceEmphasis}
         />
       </div>
