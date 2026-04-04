@@ -68,11 +68,13 @@ export function App() {
       )}`,
     },
     {
-      label: "Estimated Income Tax",
-      value: formatMoney(Math.max(0, summary.taxAfterCredits)),
-      detail: `Before credits: ${formatMoney(summary.incomeTaxBeforeCredits)} · Credits: ${formatMoney(
-        summary.nonRefundableCredits + form.credits.refundableCredits,
-      )}`,
+      label: "Estimated Federal Tax",
+      value: formatMoney(Math.max(0, summary.totalTax)),
+      detail: `Income tax: ${formatMoney(
+        summary.incomeTaxAfterNonRefundable,
+      )} · SE: ${formatMoney(summary.selfEmploymentTax)} · NIIT: ${formatMoney(
+        summary.netInvestmentIncomeTax,
+      )} · Addl Medicare: ${formatMoney(summary.additionalMedicareTax)}`,
     },
     {
       label: "Total Paid/Withheld",
@@ -273,7 +275,7 @@ export function App() {
         </Section>
 
         <Section title="Other Income">
-          <div className="grid__three">
+          <div className="grid__two">
             <NumberField
               label="Interest (HYSA, savings)"
               value={form.otherIncome.interest}
@@ -285,22 +287,42 @@ export function App() {
               }
             />
             <NumberField
-              label="Dividends"
-              value={form.otherIncome.dividends}
+              label="Ordinary dividends"
+              value={form.otherIncome.ordinaryDividends}
               onChange={(value) =>
                 setForm((prev) => ({
                   ...prev,
-                  otherIncome: { ...prev.otherIncome, dividends: value },
+                  otherIncome: { ...prev.otherIncome, ordinaryDividends: value },
                 }))
               }
             />
             <NumberField
-              label="Capital gains"
-              value={form.otherIncome.capitalGains}
+              label="Qualified dividends"
+              value={form.otherIncome.qualifiedDividends}
               onChange={(value) =>
                 setForm((prev) => ({
                   ...prev,
-                  otherIncome: { ...prev.otherIncome, capitalGains: value },
+                  otherIncome: { ...prev.otherIncome, qualifiedDividends: value },
+                }))
+              }
+            />
+            <NumberField
+              label="Short-term capital gains"
+              value={form.otherIncome.shortTermCapitalGains}
+              onChange={(value) =>
+                setForm((prev) => ({
+                  ...prev,
+                  otherIncome: { ...prev.otherIncome, shortTermCapitalGains: value },
+                }))
+              }
+            />
+            <NumberField
+              label="Long-term capital gains"
+              value={form.otherIncome.longTermCapitalGains}
+              onChange={(value) =>
+                setForm((prev) => ({
+                  ...prev,
+                  otherIncome: { ...prev.otherIncome, longTermCapitalGains: value },
                 }))
               }
             />
@@ -393,35 +415,63 @@ export function App() {
 
         <Section title="Credits">
           <div className="grid__three">
+            <div className="field field--full">
+              <Toggle
+                label="Auto-calc child/dependent credits"
+                checked={form.useAutoCredits}
+                onChange={(value) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    useAutoCredits: value,
+                  }))
+                }
+              />
+              <span className="field__hint">Uses dependents and MAGI for CTC/ODC.</span>
+            </div>
             <NumberField
               label="Child tax credit"
-              value={form.credits.childTaxCredit}
+              value={
+                form.useAutoCredits
+                  ? summary.autoCredits.childCreditTotal
+                  : form.credits.childTaxCredit
+              }
               onChange={(value) =>
                 setForm((prev) => ({
                   ...prev,
                   credits: { ...prev.credits, childTaxCredit: value },
                 }))
               }
+              disabled={form.useAutoCredits}
+              hint={form.useAutoCredits ? "Auto-calculated from dependents." : undefined}
             />
             <NumberField
               label="Other dependent credit"
-              value={form.credits.otherDependentCredit}
+              value={
+                form.useAutoCredits
+                  ? summary.autoCredits.otherDependentCredit
+                  : form.credits.otherDependentCredit
+              }
               onChange={(value) =>
                 setForm((prev) => ({
                   ...prev,
                   credits: { ...prev.credits, otherDependentCredit: value },
                 }))
               }
+              disabled={form.useAutoCredits}
+              hint={form.useAutoCredits ? "Auto-calculated from dependents." : undefined}
             />
             <NumberField
-              label="Dependent care credit"
-              value={form.credits.dependentCareCredit}
+              label="Childcare expenses"
+              value={form.credits.dependentCareExpenses}
               onChange={(value) =>
                 setForm((prev) => ({
                   ...prev,
-                  credits: { ...prev.credits, dependentCareCredit: value },
+                  credits: { ...prev.credits, dependentCareExpenses: value },
                 }))
               }
+              hint={`Estimated dependent care credit: ${formatMoney(
+                summary.dependentCareCredit,
+              )}. Uses qualifying children count and assumes no DCFSA benefits.`}
             />
             <NumberField
               label="Education credits"
@@ -462,7 +512,11 @@ export function App() {
                   credits: { ...prev.credits, refundableCredits: value },
                 }))
               }
-              hint="Additional child tax credit, other refundable"
+              hint={
+                form.useAutoCredits
+                  ? `Auto ACTC: ${formatMoney(summary.refundableChildCredit)}`
+                  : "Additional child tax credit, other refundable"
+              }
             />
           </div>
         </Section>
@@ -530,8 +584,9 @@ export function App() {
 
       <footer className="footer">
         <p>
-          This estimator focuses on federal income tax. It does not calculate FICA, AMT, or state
-          taxes. Enter known credits and deductions for the most accurate projection.
+          This estimator focuses on federal income tax and includes self-employment tax, NIIT, and
+          Additional Medicare tax where applicable. It does not calculate AMT or state taxes. Enter
+          known credits and deductions for the most accurate projection.
         </p>
         <p>
           Values shown are estimates. For filing decisions, consult IRS guidance or a qualified tax

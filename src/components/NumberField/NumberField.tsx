@@ -9,11 +9,20 @@ type NumberFieldProps = {
   hint?: string;
   min?: number;
   step?: number;
+  disabled?: boolean;
 };
 
-export const NumberField = ({ label, value, onChange, hint, min, step }: NumberFieldProps) => {
+export const NumberField = ({
+  label,
+  value,
+  onChange,
+  hint,
+  min,
+  step,
+  disabled,
+}: NumberFieldProps) => {
   const [displayValue, setDisplayValue] = useState<string>(() =>
-    Number.isNaN(value) ? "" : String(value),
+    Number.isFinite(value) ? String(value) : "",
   );
   const [isFocused, setIsFocused] = useState(false);
 
@@ -29,7 +38,7 @@ export const NumberField = ({ label, value, onChange, hint, min, step }: NumberF
 
   useEffect(() => {
     if (!isFocused) {
-      setDisplayValue(Number.isNaN(value) ? "" : String(value));
+      setDisplayValue(Number.isFinite(value) ? String(value) : "");
     }
   }, [isFocused, value]);
 
@@ -47,6 +56,7 @@ export const NumberField = ({ label, value, onChange, hint, min, step }: NumberF
         min={min}
         step={step ?? 1}
         value={displayValue}
+        disabled={disabled}
         onFocus={() => setIsFocused(true)}
         onBlur={() => {
           setIsFocused(false);

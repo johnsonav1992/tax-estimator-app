@@ -149,6 +149,10 @@ h3 {
   gap: 6px;
 }
 
+.field--full {
+  grid-column: 1 / -1;
+}
+
 .field__label {
   font-size: 0.85rem;
   color: var(--ink-soft);
@@ -169,6 +173,27 @@ h3 {
   font-size: 0.95rem;
   font-family: inherit;
   background: #fffdfb;
+}
+
+.field__input[type="file"] {
+  padding: 8px 10px;
+  background: #ffffff;
+  border-style: dashed;
+}
+
+.field__input[type="file"]::file-selector-button {
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.field__input[type="file"]::file-selector-button:hover {
+  background: #1d4ed8;
 }
 
 .select {

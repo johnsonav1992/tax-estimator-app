@@ -25,8 +25,10 @@ export const jobIncomeSchema = z.object({
 
 export const otherIncomeSchema = z.object({
   interest: z.number(),
-  dividends: z.number(),
-  capitalGains: z.number(),
+  ordinaryDividends: z.number(),
+  qualifiedDividends: z.number(),
+  shortTermCapitalGains: z.number(),
+  longTermCapitalGains: z.number(),
   selfEmployment: z.number(),
   rental: z.number(),
   other: z.number(),
@@ -35,7 +37,7 @@ export const otherIncomeSchema = z.object({
 export const creditsSchema = z.object({
   childTaxCredit: z.number(),
   otherDependentCredit: z.number(),
-  dependentCareCredit: z.number(),
+  dependentCareExpenses: z.number(),
   educationCredits: z.number(),
   energyCredits: z.number(),
   otherNonRefundableCredits: z.number(),
@@ -69,6 +71,7 @@ export const formStateSchema = z.object({
   deductions: deductionsSchema,
   credits: creditsSchema,
   payments: paymentsSchema,
+  useAutoCredits: z.boolean(),
   useCustomBrackets: z.boolean(),
   customStandardDeduction: z.number(),
   customBrackets: z.array(bracketRowSchema),

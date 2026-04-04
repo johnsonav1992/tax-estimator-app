@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { formatMoney } from "../../lib/format";
 import { parsePaystubWithIntegrations } from "../../integrations/paystubIntegrations";
 import type { PaystubExtraction } from "../../integrations/types";
+import { formatMoney } from "../../lib/format";
 import { extractPdfText } from "../../lib/paystub";
 import type { JobIncome } from "../../types";
 import { NumberField } from "../NumberField/NumberField";

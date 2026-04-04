@@ -1,9 +1,8 @@
-import { paystubExtractionSchema } from "./types";
 import { PaystubParserBase } from "./PaystubParserBase";
 import type { PaystubExtraction } from "./types";
+import { paystubExtractionSchema } from "./types";
 
 const moneyRegex = /\$[\d,]+(?:\.\d{2})?/g;
-const numberRegex = /\d{1,3}(?:,\d{3})*(?:\.\d{2})?|\d+(?:\.\d{2})?/g;
 
 const parseMoney = (value: string): number | null => {
   const cleaned = value.replace(/[$,]/g, "");
@@ -18,33 +17,6 @@ const extractMoneyValues = (line: string): number[] => {
   }
   return matches.map(parseMoney).filter((value): value is number => value !== null);
 };
-
-const extractNumbers = (line: string): number[] => {
-  const matches = line.match(numberRegex);
-  if (!matches) {
-    return [];
-  }
-  return matches.map(parseMoney).filter((value): value is number => value !== null);
-};
-
-const pickPairFromLine = (line: string, prefer: "first" | "last" = "last") => {
-  const moneyValues = extractMoneyValues(line);
-  const numbers = moneyValues.length ? moneyValues : extractNumbers(line);
-  if (numbers.length === 0) {
-    return { current: null, ytd: null };
-  }
-  if (numbers.length === 1) {
-    return { current: numbers[0], ytd: numbers[0] };
-  }
-  if (prefer === "first") {
-    return { current: numbers[0], ytd: numbers[1] ?? numbers[0] };
-  }
-  const lastTwo = numbers.slice(-2);
-  return { current: lastTwo[0], ytd: lastTwo[1] ?? lastTwo[0] };
-};
-
-const findLine = (lines: string[], pattern: RegExp) =>
-  lines.find((line) => pattern.test(line.toUpperCase())) ?? null;
 
 const findAmountPairAfterLabel = (
   lines: string[],
@@ -113,7 +85,9 @@ class DayforceParser extends PaystubParserBase {
     const hasFederalExtra = normalized.includes("FEDERAL 2C/EXTRA");
     const hasPayFrequency = normalized.includes("PAY FREQUENCY");
     const hasMemoInfo = normalized.includes("MEMO INFORMATION");
-    return (hasDepositAdvice && hasFederalExtra) || (hasDepositAdvice && hasPayFrequency) || hasMemoInfo;
+    return (
+      (hasDepositAdvice && hasFederalExtra) || (hasDepositAdvice && hasPayFrequency) || hasMemoInfo
+    );
   }
 
   parse(text: string): PaystubExtraction {

@@ -1,6 +1,6 @@
-import { paystubExtractionSchema } from "./types";
 import { PaystubParserBase } from "./PaystubParserBase";
 import type { PaystubExtraction } from "./types";
+import { paystubExtractionSchema } from "./types";
 
 const moneyRegex = /\$[\d,]+(?:\.\d{2})?/g;
 const numberRegex = /\d{1,3}(?:,\d{3})*(?:\.\d{2})?|\d+(?:\.\d{2})?/g;

@@ -24,8 +24,10 @@ export const initialState = (filingStatus: FilingStatus): FormState => ({
   },
   otherIncome: {
     interest: 0,
-    dividends: 0,
-    capitalGains: 0,
+    ordinaryDividends: 0,
+    qualifiedDividends: 0,
+    shortTermCapitalGains: 0,
+    longTermCapitalGains: 0,
     selfEmployment: 0,
     rental: 0,
     other: 0,
@@ -39,7 +41,7 @@ export const initialState = (filingStatus: FilingStatus): FormState => ({
   credits: {
     childTaxCredit: 0,
     otherDependentCredit: 0,
-    dependentCareCredit: 0,
+    dependentCareExpenses: 0,
     educationCredits: 0,
     energyCredits: 0,
     otherNonRefundableCredits: 0,
@@ -49,6 +51,7 @@ export const initialState = (filingStatus: FilingStatus): FormState => ({
     estimatedPayments: 0,
     otherPayments: 0,
   },
+  useAutoCredits: true,
   useCustomBrackets: false,
   customStandardDeduction: STANDARD_DEDUCTION_2026[filingStatus],
   customBrackets: BRACKETS_2026[filingStatus].map((bracket, index) => ({

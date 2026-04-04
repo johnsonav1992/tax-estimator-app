@@ -1,7 +1,7 @@
-import type { PaystubParser } from "./types";
+import { dayforceParser } from "./dayforce";
 import { genericParser } from "./generic";
 import { justworksParser } from "./justworks";
-import { dayforceParser } from "./dayforce";
+import type { PaystubParser } from "./types";
 
 export const paystubParsers: PaystubParser[] = [justworksParser, dayforceParser, genericParser];
 
