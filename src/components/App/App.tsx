@@ -432,7 +432,7 @@ export function App() {
               label="Child tax credit"
               value={
                 form.useAutoCredits
-                  ? summary.autoCredits.childCreditTotal
+                  ? summary.autoCredits.childCreditTotal ?? 0
                   : form.credits.childTaxCredit
               }
               onChange={(value) =>
